@@ -1,0 +1,17 @@
+# ninja log v5
+10	114	7021982601665743	CMakeFiles/binary_calculator.dir/stack.c.obj	1d120236430c1d59
+2	106	7021986870652406	CMakeFiles/binary_calculator.dir/main.c.obj	931e9b7bde644b80
+106	235	7021986871873254	binary_calculator.exe	9ad3c6c7cae2e3e7
+2	129	7021985183119797	CMakeFiles/binary_calculator.dir/linkedlist1.c.obj	d2bd3bac70e40f2e
+15	171	7030616097154628	CMakeFiles/binary_calculator.dir/stack.c.obj	a47870198eaadddc
+2	178	7030616097196650	CMakeFiles/binary_calculator.dir/main.c.obj	42bba00b9feefa19
+8	194	7030616097398295	CMakeFiles/binary_calculator.dir/linkedlist1.c.obj	87f927902a004a1c
+195	496	7030616100351976	binary_calculator.exe	9ad3c6c7cae2e3e7
+7	889	7030617001504352	CMakeFiles/binary_calculator.dir/linkedlist1.c.obj	87f927902a004a1c
+891	2600	7030617017399168	binary_calculator.exe	9ad3c6c7cae2e3e7
+11	275	7030633340924906	CMakeFiles/binary_calculator.dir/linkedlist1.c.obj	87f927902a004a1c
+276	476	7030633342898594	binary_calculator.exe	9ad3c6c7cae2e3e7
+2	264	7030633823521711	CMakeFiles/binary_calculator.dir/linkedlist1.c.obj	87f927902a004a1c
+264	375	7030633824574864	binary_calculator.exe	9ad3c6c7cae2e3e7
+28	1367	7030635810015178	CMakeFiles/binary_calculator.dir/linkedlist1.c.obj	87f927902a004a1c
+1369	3203	7030635827358355	binary_calculator.exe	9ad3c6c7cae2e3e7
