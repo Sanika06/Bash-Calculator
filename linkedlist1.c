@@ -84,7 +84,7 @@ void makeListsEqual(List *l1, List *l2) {
     }
     return;
 }
-List removeLeadingZeros(List head) {
+List removeStartingZeros(List head) {
     while (head != NULL && head->data == 0) {
         node *temp = head;
         head = head->next;
@@ -168,8 +168,7 @@ List addList(List l1, List l2){
     return sum;
 }
 
-List subList(List l1, List l2)
-{
+List subList(List l1, List l2) {
     if (!(l1))
         return l2;
 
@@ -179,28 +178,26 @@ List subList(List l1, List l2)
 //    reverse(&l2);
     List result;
     initList(&result);
-
-    int diff = 0, borrow = 0;
+    int diff = 0, borrow = 0, flag = 0;
     node *p = l1;
     node *q = l2;
+    reverse(&l1);
+    reverse(&l2);
 
-    if(!compareTwoLinkedlists(l1,l2))
-    {
+    if(!compareTwoLinkedlists(l1,l2)){
         p = l2;
         q = l1;
     }
-
-    while(p && q)
-    {
+    reverse(&l1);
+    reverse(&l2);
+    while(p && q){
         diff = p -> data - q -> data - borrow;
 
-        if(diff < 0)
-        {
+        if(diff < 0){
             diff += 10;
             borrow = 1;
         }
-        else
-        {
+        else{
             borrow = 0;
         }
 
@@ -211,16 +208,13 @@ List subList(List l1, List l2)
 
     }
 
-    while(p)
-    {
+    while(p){
         diff = p -> data - borrow;
-        if(diff < 0)
-        {
+        if(diff < 0){
             diff += 10;
             borrow = 1;
         }
-        else
-        {
+        else{
             borrow = 0;
         }
         append(&result, diff);
@@ -228,22 +222,23 @@ List subList(List l1, List l2)
         p = p -> next;
     }
 
-    while(q)
-    {
+    while(q){
+//        flag = 1;
         diff = q -> data - borrow;
-        if(diff < 0)
-        {
+        if(diff < 0){
             diff += 10;
             borrow = 1;
         }
-        else
-        {
+        else{
             borrow = 0;
         }
         append(&result, diff);
 
         q = q -> next;
     }
+//    if(flag = 1) {
+//        q->data = -q->data;
+//    }
     reverse(&result);
     return result;
 }
@@ -283,7 +278,7 @@ List mulList(List l1, List l2) {
         rows++;
     }
     reverse(&product);
-    product = removeLeadingZeros(product);
+    product = removeStartingZeros(product);
     return product;
 }
 
@@ -291,10 +286,13 @@ List divList(List dividend, List divisor) {
     List orgdvs;
     initList(&orgdvs);
     orgdvs = copyLinkedList(divisor, orgdvs);
-    List dvsCopy = orgdvs;
+//    List dvsCopy = orgdvs;
+
     reverse(&dividend);
     reverse(&divisor);
+
     node* p = dividend;
+
     List l1;
     initList(&l1);
 
@@ -307,12 +305,21 @@ List divList(List dividend, List divisor) {
         append(&quotient, INT_MIN);
         return quotient;
     }
-    if(compareTwoLinkedlists(dividend, divisor) == 2) {     //if both lists are same
+
+    int cmpResult = compareTwoLinkedlists(dividend, divisor);
+    if(cmpResult == 2) {     //if both lists are same
         append(&quotient, 1);
         return quotient;
     }
+    else if(cmpResult == 0) {
+        append(&quotient, 0);
+        return quotient;
+    }
+
     node *q = divisor;
-    int flag = 0;
+    int flag = 0, hasZero = 0;
+
+    divisor = removeStartingZeros(divisor);
 
     while(p) {
         if(q->next) {
@@ -320,30 +327,64 @@ List divList(List dividend, List divisor) {
             p = p->next;
             flag = 1;
         }
+        
         while(p && compareTwoLinkedlists(l1, divisor) == 0) {    //if first list is smaller than second
             append(&l1, p->data);
-            if(flag == 1)   append(&quotient, 0);
+            if (p->data == 0) hasZero = 1;
+            else hasZero = 0;
+            if(flag || hasZero)   append(&quotient, 0);
             p = p->next;
         }
+        printf("l1 is: ");
+        display(l1);
         int count = 0;
+//        if(isZero(l1)) flag = 1;
+        if(!isZero(l1)) {
+            while (compareTwoLinkedlists(l1, divisor) == 1 || compareTwoLinkedlists(l1, divisor) == 2) {      //while dividend is greater than or equal
+                reverse(&l1);
+                l1 = subList(l1, orgdvs);
+                count++;
+    //            divisor = removeStartingZeros(divisor);
+            }
+            if(count >= 10) {
+                append(&quotient, count%10);
+                count = count/10;
+            }
+            append(&quotient, count);
 
-        while (compareTwoLinkedlists(l1, divisor) == 1 || compareTwoLinkedlists(l1, divisor) == 2) {      //while dividend is greater than or equal
-            reverse(&l1);
-            l1 = subList(l1, orgdvs);
-            if(isZero(l1)) flag = 1;
-            count++;
-            divisor = removeLeadingZeros(divisor);
+            if(isZero(l1))  l1 = NULL;
         }
-        if(count >= 10) {
-            append(&quotient, count%10);
-            count = count/10;
+        else {
+            if(!hasZero)
+                append(&quotient, 0);
+            l1 = NULL;
         }
-        append(&quotient, count);
-
-        if(isZero(l1))  l1 = NULL;
     }
-    quotient = removeLeadingZeros(quotient);
+    quotient = removeStartingZeros(quotient);
     return quotient;
+}
+
+List remainder(List dividend, List divisor) {
+    List quotient, remainder, QD;
+    initList(&quotient);
+    initList(&remainder);
+    initList(&QD);
+
+    display(dividend);
+    quotient = divList(dividend, divisor);
+    display(quotient);
+
+    reverse(&quotient);
+    reverse(&divisor);
+    reverse(&dividend);
+
+    QD = mulList(quotient, divisor);
+    display(QD);
+
+    reverse(&QD);
+    remainder = subList(dividend, QD);
+    reverse(&remainder);
+    return remainder;
 }
 List powList(List l1, List pow) {
     List p = l1;

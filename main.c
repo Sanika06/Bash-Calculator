@@ -24,7 +24,7 @@ int precedence(char operator)
 }
 
 int isOperator(char ch) {
-    return (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^');
+    return (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^' || ch == '%');
 }
 
 char* infixToPostfix(char* infix)
@@ -96,6 +96,8 @@ List evaluate(char opr, List a, List b)
         case '*': result = mulList(a, b);
             break;
         case '/': result = divList(a, b);
+            break;
+        case '%': result = remainder(a, b);
             break;
         case '^': result = powList(a, b);
             break;
