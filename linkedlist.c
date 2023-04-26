@@ -1,228 +1,417 @@
+
 //
-////
-//// Created by Dell on 3/3/2023.
-////
-//#include<stdio.h>
-//#include"linkedlist.h"
-//#include<stdlib.h>
+// Created by Dell on 3/3/2023.
 //
-//void initList(List *l) {
-//    *l = NULL;
-//}
-//
-//node* createNewNode(List *l, int data) {
-//    node *nn = (node*)malloc(sizeof(node));
-//    if(!nn) return NULL;
-//
-//    nn->data = data;
-//    nn->next = NULL;
-//    return nn;
-//}
-//
-//int count(List l) {
-//    int count = 0;
-//    node *p = l;
-//    while(p) {
-//        p = p->next;
-//        count += 1;
+#include<stdio.h>
+#include<stdlib.h>
+#include <limits.h>
+#include"linkedlist.h"
+#include"stack.h"
+
+void initList(List *l) {
+    *l = NULL;
+}
+node* createNewNode(List *l, int data) {
+    node *nn = (node*)malloc(sizeof(node));
+    if(!nn) return NULL;
+
+    nn->data = data;
+    nn->next = NULL;
+    return nn;
+}
+int count(List l) {
+    int count = 0;
+    node *p = l;
+    while(p) {
+        p = p->next;
+        count += 1;
+    }
+    return count;
+}
+void append(List *l, int data) {
+    node *nn = createNewNode(l, data);
+    if(!nn) return;
+
+    if(!(*l)) {
+        *l = nn;
+        return;
+    }
+
+    node *p = *l;
+    while(p->next) {
+        p = p->next;
+    }
+    p->next = nn;
+}
+void push(List *l, int data) {
+    node *nn = createNewNode(l, data);
+    if(!nn) return;
+    nn->next = *l;
+    *l = nn;
+}
+void reverse(List *l) {
+    node *p = *l;
+    node *q = NULL;
+    node *temp = NULL;
+    while(p) {
+        temp = p->next;
+        p->next = q;
+        q = p;
+        p = temp;
+    }
+    *l = q;
+}
+List copyLinkedList(List l1, List l2) {
+    node *p = l1;
+    while(p) {
+        append(&l2, p->data);
+        p = p->next;
+    }
+    return l2;
+}
+void makeListsEqual(List *l1, List *l2) {
+    while(count(*l1)>count(*l2)) {
+        push(l2, 0);
+    }
+    while(count(*l2) > count(*l1)) {
+        push(l1, 0);
+    }
+    return;
+}
+List removeStartingZeros(List head) {
+    if(isZero(head)) {
+        List newHead;
+        initList(&newHead);
+        append(&newHead, 0);
+        return newHead;
+    }
+    while (head != NULL && head->data == 0) {
+        node *temp = head;
+        head = head->next;
+        free(temp);
+    }
+    return head;
+
+}
+int unitDigit(int pdata, int qdata, int *carry, char opr) {
+    int value = 0;
+    switch(opr) {
+        case '+':
+            value = pdata + qdata + *carry;
+            break;
+        case '*':
+            value = pdata * qdata + *carry;
+    }
+    *carry = 0;
+    int unit = value;
+        unit %= 10;
+        *carry = value/10;
+    return unit;
+}
+int isZero(List l1) {
+    node *p = l1;
+    while(p) {
+        if(p->data != 0) return 0;
+        p = p->next;
+    }
+    return 1;
+}
+int compareTwoLinkedlists(List l1, List l2) {
+    makeListsEqual(&l1, &l2);
+    node* p = l1;
+    node* q = l2;
+
+    while(p) {
+        if(p -> data > q -> data)
+            return 1;       //if first list is greater
+        else if(p -> data < q -> data)
+            return 0;       //if second list is greater
+        else
+            p = p -> next;
+            q = q -> next;
+    }
+    return 2;               //if both lists are equal
+}
+List addList(List l1, List l2){
+    List sum;
+    initList(&sum);
+    node *p = l1;
+    node *q = l2;
+
+    int carry = 0;
+    int unit = 0;
+
+    while(p && q) {
+        unit = unitDigit(p ->data, q ->data, &carry, '+');
+        append(&sum, unit);
+        p = p->next;
+        q = q->next;
+    }
+
+    while(q) {
+        unit = unitDigit(0, q ->data, &carry, '+');
+        append(&sum, unit);
+        q = q->next;
+    }
+
+    while(p) {
+        unit = unitDigit(p ->data, 0, &carry, '+');
+        append(&sum, unit);
+
+        p = p->next;
+    }
+
+    if(carry>0) {
+        append(&sum, carry);
+    }
+    reverse(&sum);
+    return sum;
+}
+
+List subList(List l1, List l2) {
+    if (!(l1))
+        return l2;
+
+    if(!(l2))
+        return l1;
+    List result;
+    initList(&result);
+    int diff = 0, borrow = 0, sign = 0; //sign = 0 is for positive
+    node *p = l1;
+    node *q = l2;
+    reverse(&l1);
+    reverse(&l2);
+
+    if(!compareTwoLinkedlists(l1,l2)){
+        p = l2;
+        q = l1;
+        sign = 1;
+    }
+    reverse(&l1);
+    reverse(&l2);
+    while(p && q){
+        diff = p -> data - q -> data - borrow;
+
+        if(diff < 0){
+            diff += 10;
+            borrow = 1;
+        }
+        else{
+            borrow = 0;
+        }
+
+        append(&result, diff);
+
+        p = p -> next;
+        q = q -> next;
+
+    }
+
+    while(p){
+        diff = p -> data - borrow;
+        if(diff < 0){
+            diff += 10;
+            borrow = 1;
+        }
+        else{
+            borrow = 0;
+        }
+        append(&result, diff);
+
+        p = p -> next;
+    }
+
+    while(q){
+//        flag = 1;
+        diff = q -> data - borrow;
+        if(diff < 0){
+            diff += 10;
+            borrow = 1;
+        }
+        else{
+            borrow = 0;
+        }
+        append(&result, diff);
+
+        q = q -> next;
+    }
+    reverse(&result);
+    result = removeStartingZeros(result);
+//    if(sign == 1) {
+//        result->data = -result->data;
 //    }
-//    //printf("Count is: %d\n", count);
-//    return count;
-//}
-//
-//void append(List *l, int data) {
-//    node *nn = createNewNode(l, data);
-//    if(!nn) return;
-//
-//    if(!(*l)) {
-//        *l = nn;
-//        return;
-//    }
-//
-//    node *p = *l;
-//    while(p->next) {
-//        p = p->next;
-//    }
-//    p->next = nn;
-//    return;
-//}
-//
-//void push(List *l, int data) {
-//    node *nn = createNewNode(l, data);
-//    if(!nn) return;
-//    nn->next = *l;
-//    *l = nn;
-//    return;
-//}
-//void reverse(List *l) {
-//    node *p = *l;
-//    node *q = NULL;
-//    node *temp = NULL;
-//    while(p) {
-//        temp = p->next;
-//        p->next = q;
-//        q = p;
-//        p = temp;
-//    }
-//    *l = q;
-//    return;
-//}
-//
-//int unitDigit(int pdata, int qdata, int *carry, char opr) {
-//    int value = 0;
-//    switch(opr) {
-//        case '+':
-//            value = pdata + qdata + *carry;
-//            break;
-//        case '*':
-//            value = pdata * qdata + *carry;
-//    }
-//    *carry = 0;
-//    int unit = value;
-//    if(value >= 10) {
-//        unit %= 10;
-//        *carry = value/10;
-//    }
-//    return unit;
-//}
-//
-//List addList(List l1, List l2) {
-////    List sum;
-////    initList(&sum);
-//    node *p = l1;
-//    node *q = l2;
-//
-//    int carry = 0;
-//    int unit = 0;
-//
-//    while(p && q) {
-//        unit = unitDigit(p->data, q->data, &carry, '+');
-//        p->data = unit;
-//        p = p->next;
-//        q = q->next;
-//    }
-//
-//    while(q) {
-//        unit = unitDigit(0, q->data, &carry, '+');
-//        append(&p, unit);
-//        q = q->next;
-//    }
-//
-//    while(p) {
-//        unit = unitDigit(p->data, 0, &carry, '+');
-//        p->data = unit;
-//        p = p->next;
-//    }
-//
-//    if(carry>0) {
-//        append(&p, carry);
-//    }
-//
-//    return l1;
-//}
-//
-//// Remove Zeros
-//List subList(List l1, List l2) {
-//    List diff;
-//    initList(&diff);
-//
-//    node *p, *q;
-//
-//    int sign = 0;   //positive
-//
-//    if(count(l1) == count(l2)) {
-//        reverse(&l1);
-//        printf("\nReverse of l1 is: ");
-//        display(l1);
-//
-//        reverse(&l2);
-//        printf("\nReverse of l2 is: ");
-//        display(l2);
-//
-//        p = l1;
-//        q = l2;
-//        while (p && q) {
-//            if (p->data < q->data) {
-//                reverse(&l2);
-//                reverse(&l1);
-//                sign = -1;
-//                break;
-//            }
-//            else if(p->data > q->data) {
-//                break;
-//            }
-//            else {
-//                p = p->next;
-//                q = q->next;
-//            }
-//        }
-//    }
-//    p = l1;
-//    q = l2;
-//
-//    if(count(l1) < count(l2) || sign == -1) {
-//        p = l2;
-//        q = l1;
-//        sign = -1;   //negative
-//    }
-//
-//    int unit = 0;
-//
-//    while(p && q) {
-//        node *p1 = p;
-//        node *p2 = p->next;
-//        if(p->data < q->data) {
-//            p1->data = p->data + 10;
-//            p2->data = p2->data - 1;
-//        }
-//        unit = p->data - q->data;
-//        append(&diff, unit);
-//
-//        p = p->next;
-//        q = q->next;
-//    }
-//
-//    while(p) {
-//        if(!p->next && sign == -1)
-//            p->data = p->data *(-1);
-//
-//        unit = p->data;
-//        append(&diff, unit);
-//        p = p->next;
-//    }
-//
-//    return diff;
-//}
-///*
-// * 1 2 3
-// *   4 5
-// *   1
-// * 3 2 1    l1  p
-// * 5 4      l2  q
-// * 5
-// *
-// * int count = 0;
-// * while(q) {
-// *      carry = 0;
-// *      while(count>0) {
-// *          append(&mul, 0);
-// *      }
-// *      while(p) {
-// *          push(&mul, unitDigit(p->data, q->data, int *carry, '*'));
-// *          p = p->next;
-// *      }
-// *      addList(
-// *      q = q->next;
-// */
-//List mulList(List l1, List l2) {
-//
-//}
-//
-//void display(List l) {
-//    node* p = l;
-//    while(p) {
-//        printf("%d -> ", p->data);
-//        p = p->next;
-//    }
-//    printf("NULL\n");
-//}
+    return result;
+}
+
+List mulList(List l1, List l2) {
+    List product, otherProduct;
+    initList(&product);
+    int rows = 0;
+    int unit = 0;
+    int carry = 0;
+
+    List q = l2;
+
+    while(q) {
+        node *p = l1;
+        carry = 0;
+        initList(&otherProduct);
+
+        while(p) {
+            unit = unitDigit(p->data, q->data, &carry, '*');
+            append(&otherProduct, unit);
+            p = p->next;
+        }
+
+        for(int i= 0; i< rows; i++) {
+            push(&otherProduct, 0);
+        }
+
+        if(carry) {
+            append(&otherProduct, carry);
+        }
+
+        q = q->next;
+
+        product = addList(product, otherProduct);
+        reverse(&product);
+        rows++;
+    }
+    reverse(&product);
+    product = removeStartingZeros(product);
+    return product;
+}
+
+//725279754/5 zero is not appending
+List divList(List dividend, List divisor) {
+    List quotient;
+    initList(&quotient);
+    if(isZero(divisor)) {
+        append(&quotient, INT_MIN);
+        return quotient;
+    }
+
+    List orgdvs;
+    initList(&orgdvs);
+    orgdvs = copyLinkedList(divisor, orgdvs);
+
+    reverse(&dividend);
+    reverse(&divisor);
+
+    node* p = dividend;
+
+    List l1;
+    initList(&l1);
+
+    node *remainder;
+
+    initList(&remainder);
+
+    int cmpResult = compareTwoLinkedlists(dividend, divisor);
+    if(cmpResult == 2) {     //if both lists are same
+        append(&quotient, 1);
+        return quotient;
+    }
+    else if(cmpResult == 0) {
+        append(&quotient, 0);
+        return quotient;
+    }
+
+    node *q = divisor;
+    int flag = 0, hasZero = 0;
+
+    divisor = removeStartingZeros(divisor);
+
+    while(p) {
+        if(q->next) {
+            append(&l1, p->data);
+            p = p->next;
+            flag = 1;
+        }
+
+        while(p && compareTwoLinkedlists(l1, divisor) == 0) {    //if first list is smaller than second
+            append(&l1, p->data);
+            if (p->data == 0) hasZero = 1;
+            else hasZero = 0;
+            if(flag || hasZero)   append(&quotient, 0);
+            p = p->next;
+        }
+        int count = 0;
+//        if(isZero(l1)) flag = 1;
+        if(!isZero(l1)) {
+            while (compareTwoLinkedlists(l1, divisor) == 1 || compareTwoLinkedlists(l1, divisor) == 2) {      //while dividend is greater than or equal
+                reverse(&l1);
+                l1 = subList(l1, orgdvs);
+                count++;
+            }
+            if(count >= 10) {
+                append(&quotient, count%10);
+                count = count/10;
+            }
+            append(&quotient, count);
+
+            if(isZero(l1))  l1 = NULL;
+        }
+        else {
+            if(!hasZero)
+                append(&quotient, 0);
+            l1 = NULL;
+        }
+    }
+    quotient = removeStartingZeros(quotient);
+    return quotient;
+}
+
+List modList(List dividend, List divisor) {
+    List remainder;
+    if(isZero(divisor)) {
+        append(&remainder, INT_MIN);
+        return remainder;
+    }
+    List quotient, QD, dvsCopy, dvdCopy;
+    initList(&quotient);
+    initList(&remainder);
+    initList(&QD);
+    initList(&dvsCopy);
+    initList(&dvdCopy);
+    dvsCopy = copyLinkedList(divisor, dvsCopy);
+    dvdCopy = copyLinkedList(dividend, dvdCopy);
+
+    display(dvsCopy);
+    quotient = divList(dividend, divisor);
+
+    reverse(&quotient);
+
+    QD = mulList(quotient, dvsCopy);
+
+    reverse(&QD);
+
+    remainder = subList(dvdCopy, QD);
+
+    return remainder;
+}
+
+List powList(List l1, List pow) {
+    List p = l1;
+    List one;
+    initList(&one);
+    append(&one, 1);
+    if(isZero(pow)) return one;
+    pow = subList(pow, one);
+    while(!isZero(pow)) {
+        l1 = mulList(l1, p);
+        reverse(&l1);
+        pow = subList(pow, one);
+    }
+    reverse(&l1);
+    return l1;
+}
+
+void display(List l) {
+    node* p = l;
+    while(p) {
+        printf("%d", p->data);
+        p = p->next;
+    }
+    printf("\n");
+}
