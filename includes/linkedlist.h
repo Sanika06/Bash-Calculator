@@ -19,7 +19,7 @@ List addList(List l1, List l2);
 List subList(List l1, List l2);
 List mulList(List l1, List l2);
 List divList(List dividend, List divisor);
-List remainder(List dividend, List divisor);
+List modList(List dividend, List divisor);
 List powList(List l1, List pow);
 void eval(char arr[], List l1, List l2);
 

@@ -26,7 +26,6 @@ int count(List l) {
         p = p->next;
         count += 1;
     }
-    //printf("Count is: %d\n", count);
     return count;
 }
 void append(List *l, int data) {
@@ -43,15 +42,12 @@ void append(List *l, int data) {
         p = p->next;
     }
     p->next = nn;
- //   printf("\n%d appended",(*l)->data);
-    return;
 }
 void push(List *l, int data) {
     node *nn = createNewNode(l, data);
     if(!nn) return;
     nn->next = *l;
     *l = nn;
-    return;
 }
 void reverse(List *l) {
     node *p = *l;
@@ -64,11 +60,9 @@ void reverse(List *l) {
         p = temp;
     }
     *l = q;
-    return;
 }
 List copyLinkedList(List l1, List l2) {
     node *p = l1;
-    node *q = l2;
     while(p) {
         append(&l2, p->data);
         p = p->next;
@@ -85,6 +79,12 @@ void makeListsEqual(List *l1, List *l2) {
     return;
 }
 List removeStartingZeros(List head) {
+    if(isZero(head)) {
+        List newHead;
+        initList(&newHead);
+        append(&newHead, 0);
+        return newHead;
+    }
     while (head != NULL && head->data == 0) {
         node *temp = head;
         head = head->next;
@@ -174,11 +174,9 @@ List subList(List l1, List l2) {
 
     if(!(l2))
         return l1;
-//    reverse(&l1);
-//    reverse(&l2);
     List result;
     initList(&result);
-    int diff = 0, borrow = 0, flag = 0;
+    int diff = 0, borrow = 0, sign = 0; //sign = 0 is for positive
     node *p = l1;
     node *q = l2;
     reverse(&l1);
@@ -187,6 +185,7 @@ List subList(List l1, List l2) {
     if(!compareTwoLinkedlists(l1,l2)){
         p = l2;
         q = l1;
+        sign = 1;
     }
     reverse(&l1);
     reverse(&l2);
@@ -236,10 +235,11 @@ List subList(List l1, List l2) {
 
         q = q -> next;
     }
-//    if(flag = 1) {
-//        q->data = -q->data;
-//    }
     reverse(&result);
+    result = removeStartingZeros(result);
+//    if(sign == 1) {
+//        result->data = -result->data;
+//    }
     return result;
 }
 
@@ -282,11 +282,18 @@ List mulList(List l1, List l2) {
     return product;
 }
 
+//725279754/5 zero is not appending
 List divList(List dividend, List divisor) {
+    List quotient;
+    initList(&quotient);
+    if(isZero(divisor)) {
+        append(&quotient, INT_MIN);
+        return quotient;
+    }
+
     List orgdvs;
     initList(&orgdvs);
     orgdvs = copyLinkedList(divisor, orgdvs);
-//    List dvsCopy = orgdvs;
 
     reverse(&dividend);
     reverse(&divisor);
@@ -297,14 +304,8 @@ List divList(List dividend, List divisor) {
     initList(&l1);
 
     node *remainder;
-    List quotient;
-    initList(&quotient);
-    initList(&remainder);
 
-    if(isZero(divisor)) {
-        append(&quotient, INT_MIN);
-        return quotient;
-    }
+    initList(&remainder);
 
     int cmpResult = compareTwoLinkedlists(dividend, divisor);
     if(cmpResult == 2) {     //if both lists are same
@@ -327,7 +328,7 @@ List divList(List dividend, List divisor) {
             p = p->next;
             flag = 1;
         }
-        
+
         while(p && compareTwoLinkedlists(l1, divisor) == 0) {    //if first list is smaller than second
             append(&l1, p->data);
             if (p->data == 0) hasZero = 1;
@@ -335,8 +336,6 @@ List divList(List dividend, List divisor) {
             if(flag || hasZero)   append(&quotient, 0);
             p = p->next;
         }
-        printf("l1 is: ");
-        display(l1);
         int count = 0;
 //        if(isZero(l1)) flag = 1;
         if(!isZero(l1)) {
@@ -344,7 +343,6 @@ List divList(List dividend, List divisor) {
                 reverse(&l1);
                 l1 = subList(l1, orgdvs);
                 count++;
-    //            divisor = removeStartingZeros(divisor);
             }
             if(count >= 10) {
                 append(&quotient, count%10);
@@ -364,28 +362,35 @@ List divList(List dividend, List divisor) {
     return quotient;
 }
 
-List remainder(List dividend, List divisor) {
-    List quotient, remainder, QD;
+List modList(List dividend, List divisor) {
+    List remainder;
+    if(isZero(divisor)) {
+        append(&remainder, INT_MIN);
+        return remainder;
+    }
+    List quotient, QD, dvsCopy, dvdCopy;
     initList(&quotient);
     initList(&remainder);
     initList(&QD);
+    initList(&dvsCopy);
+    initList(&dvdCopy);
+    dvsCopy = copyLinkedList(divisor, dvsCopy);
+    dvdCopy = copyLinkedList(dividend, dvdCopy);
 
-    display(dividend);
+    display(dvsCopy);
     quotient = divList(dividend, divisor);
-    display(quotient);
 
     reverse(&quotient);
-    reverse(&divisor);
-    reverse(&dividend);
 
-    QD = mulList(quotient, divisor);
-    display(QD);
+    QD = mulList(quotient, dvsCopy);
 
     reverse(&QD);
-    remainder = subList(dividend, QD);
-    reverse(&remainder);
+
+    remainder = subList(dvdCopy, QD);
+
     return remainder;
 }
+
 List powList(List l1, List pow) {
     List p = l1;
     List one;
@@ -401,56 +406,6 @@ List powList(List l1, List pow) {
     reverse(&l1);
     return l1;
 }
-
-//void eval(char arr[], List l1, List l2) {
-//    int i;
-//    char c;
-////    puts(arr);
-////    stack s;
-//    List result;
-//    initList(&result);
-//    for(i=0;arr[i]!='\0';i++) {
-////        printf("%c",arr[i]);
-//        if(arr[i]>'0' && arr[i]<'9') {
-//            push(&l1, (arr[i] - 48));
-//            display(l1);
-//        }
-//        else if(arr[i]=='+'){
-//            c=arr[i];
-//            push(&l2,arr[++i]-48);
-//            printf("i do %c",c);
-//        display(l2);
-//
-//
-//        }
-//
-//
-//        switch(c) {
-//            case '+':
-//                printf("heyyyy");
-//                result = addList(l1, l2);
-//
-//                display(result);
-//                break;
-//            case '-':
-//                result = subList(l1, l2);
-//                display(result);
-//                break;
-//            case '*':
-//                result = mulList(l1, l2);
-//                display(result);
-//                break;
-//            case '/':
-//                result = divList(l1, l2);
-//                display(result);
-//                break;
-//            case '^':
-//                result = powList(l1, l2);
-//                display(result);
-//                break;
-//        }
-//    }
-//}
 
 void display(List l) {
     node* p = l;

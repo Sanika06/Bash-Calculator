@@ -9,4 +9,10 @@ typedef struct node {
     struct node* next;
 }node;
 typedef node* List;
+
+typedef struct Numbers {
+    char sign;
+    int count;
+    node *numbers;
+}Number;
 #endif //BINARY_CALCULATOR_NODE_H

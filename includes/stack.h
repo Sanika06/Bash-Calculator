@@ -1,7 +1,3 @@
-//typedef struct node {
-//    int data;
-//    struct node *next;
-//}node;
 #include "node.h"
 
 //typedef struct nodeop {
