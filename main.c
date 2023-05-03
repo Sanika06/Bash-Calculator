@@ -1,56 +1,49 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
 #include<string.h>
-#include "linkedList.h"
-//#include "stack.h"
-//#include "evaluate.h"
+#include "./includes/evaluate.h"
 
-void evall(char arr[]) {
-    int i, flag = 0;
-    char c;
-    List l1, l2;
-    List result;
-    initList(&l1);
-    initList(&l2);
-    initList(&result);
-    for (i = 0; arr[i] != '\0'; i++) {
-        if (flag == 0 && arr[i] >= '0' && arr[i] <= '9')
-            push(&l1, arr[i] - 48);
-        else if (arr[i] == '+' || arr[i] == '-' || arr[i] == '*' || arr[i] == '/' || arr[i] == '%') {
-            c = arr[i];
-//            printf("%c", c);
-            flag = 1;
-        }
-        else {
-            push(&l2, arr[i] - 48);
-        }
-    }
-        switch (c) {
-        case '+':
-                result = addList(l1, l2);
-                break;
-        case '-':
-                result = subList(l1, l2);
-                break;
-        case '*':
-                result = mulList(l1, l2);
-                break;
-        case '/':
-                result = divList(l1, l2);
-                break;
-        case '%':
-                result = modList(l1, l2);
-                break;
-        }
+#define MAX 2048
 
-    display(result);
+void displayInformation(){
+    printf("\nBC SANIKA KULKARNI - 142203011");
+    printf("\nCopyright 2023 , Free Software Foundation under GNU");
+    printf("\nThis is a free and open source software with ABSOLUTELY NO WARRANTY");
+    printf("\nOperations Supported - (+  -  /  * %%)\n");
 }
 
-int main() {
-        List l1,l2;
-        char arr[1000];
-        gets(arr);
-//        printf("%s",arr);
-        evall(arr);
-        return 0;
+int main(){
+    displayInformation();
+
+    char str[MAX] = "";
+
+    while(1){
+        fgets(str,MAX,stdin);   //Get input STring
+
+        unsigned long int len = strlen(str);    //store length of String
+
+        if(len > 0 && str[len-1] == '\n'){      //handling end of string
+            str[len-1] = '\0';
+        }
+
+        if(strcmp(str,"quit")== 0|| strcmp(str,"exit") == 0)    //exitting condition
+            break;
+
+        else if(strcmp(str,"clear") ==  0){     //clear screen if specified
+            system("clear");
+            displayInformation();
+        }
+        else{
+            for(int i = 0 ; str[i] != '\0' ; i++){  //characters i.e. alphabets not allowed
+                if(isCharacter(str[i]))
+                {
+                    printf("Invalid Expression\n");
+                    exit(0);
+                }
+            }
+        }
+        infixEvaluation(str);   //evaluate expression
+
+    }
+    return 0;
 }

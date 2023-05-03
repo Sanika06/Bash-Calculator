@@ -13,6 +13,6 @@ typedef node* List;
 typedef struct Numbers {
     char sign;
     int count;
-    node *numbers;
+    List num;
 }Number;
 #endif //BINARY_CALCULATOR_NODE_H

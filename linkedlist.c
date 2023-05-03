@@ -5,11 +5,16 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include <limits.h>
-#include"linkedlist.h"
-#include"stack.h"
+#include"./includes/linkedlist.h"
+#include"./includes/stack.h"
 
 void initList(List *l) {
     *l = NULL;
+}
+void initNumber(Number *n) {
+    n->sign = '+';
+    initList(&n->num);
+    n->count = 0;
 }
 node* createNewNode(List *l, int data) {
     node *nn = (node*)malloc(sizeof(node));
@@ -377,7 +382,7 @@ List modList(List dividend, List divisor) {
     dvsCopy = copyLinkedList(divisor, dvsCopy);
     dvdCopy = copyLinkedList(dividend, dvdCopy);
 
-    display(dvsCopy);
+    displayList(dvsCopy);
     quotient = divList(dividend, divisor);
 
     reverse(&quotient);
@@ -407,7 +412,23 @@ List powList(List l1, List pow) {
     return l1;
 }
 
-void display(List l) {
+void displayNum(Number head){
+    if(!head.num)
+        return ;
+    Number temp = head;
+    if(head.num && !head.num -> next && head.num -> data == 0){  // if Answer is 0 then always set it as positive because 0 is never negative
+        temp.sign = '+';
+    }
+
+    printf("= ");
+    if(temp.sign == '-')
+        printf(" %c",temp.sign);
+
+    displayList(temp.num);
+    printf("\n");
+}
+
+void displayList(List l) {
     node* p = l;
     while(p) {
         printf("%d", p->data);
