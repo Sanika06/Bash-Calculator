@@ -227,7 +227,6 @@ List subList(List l1, List l2) {
     }
 
     while(q){
-//        flag = 1;
         diff = q -> data - borrow;
         if(diff < 0){
             diff += 10;
@@ -242,9 +241,6 @@ List subList(List l1, List l2) {
     }
     reverse(&result);
     result = removeStartingZeros(result);
-//    if(sign == 1) {
-//        result->data = -result->data;
-//    }
     return result;
 }
 
@@ -287,7 +283,6 @@ List mulList(List l1, List l2) {
     return product;
 }
 
-//725279754/5 zero is not appending
 List divList(List dividend, List divisor) {
     List quotient;
     initList(&quotient);
@@ -342,7 +337,6 @@ List divList(List dividend, List divisor) {
             p = p->next;
         }
         int count = 0;
-//        if(isZero(l1)) flag = 1;
         if(!isZero(l1)) {
             while (compareTwoLinkedlists(l1, divisor) == 1 || compareTwoLinkedlists(l1, divisor) == 2) {      //while dividend is greater than or equal
                 reverse(&l1);

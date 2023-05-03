@@ -18,7 +18,7 @@ int main(){
     char str[MAX] = "";
 
     while(1){
-        fgets(str,MAX,stdin);   //Get input STring
+        fgets(str,MAX,stdin);   //Get input String
 
         unsigned long int len = strlen(str);    //store length of String
 

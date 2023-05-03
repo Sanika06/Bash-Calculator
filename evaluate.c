@@ -1,7 +1,3 @@
-//
-// Created by Dell on 5/2/2023.
-//
-
 #include<stdio.h>
 #include<stdlib.h>
 #include"./includes/evaluate.h"
@@ -24,7 +20,6 @@ int isAnythingOther(char ch){
 }
 
 int precedence(char symbol){
-
     if(symbol == '(')
         return 0;
 
@@ -38,24 +33,8 @@ int precedence(char symbol){
         return 1;
 
     return 0;
-
 }
 
-int getAndReturnSignsOfNumber(Number a,Number b){
-    int sign = 0;
-    if((a.sign == '+' && b.sign == '+')  ){
-        sign = 1;
-    }
-    else if((a.sign == '-' && b.sign == '+') || (a.sign == '+' && b.sign == '-'))
-    {
-        sign = 2;
-    }
-    else{
-        sign = -1;
-    }
-    return sign;
-
-}
 
 void freeList(List* numList){
     while(numList){
@@ -86,52 +65,66 @@ Number copyNumber(Number Num){
     return num1;
 }
 
-Number applyOperand(Number a,Number b, char op){
+int getAndReturnSignsOfNumber(Number a,Number b){       //returns the signs of numbers
+    int sign = 0;
+    if((a.sign == '+' && b.sign == '+')  ){
+        sign = 1;       //both are positive, result is positive
+    }
+    else if((a.sign == '-' && b.sign == '+') || (a.sign == '+' && b.sign == '-'))
+    {
+        sign = 2;       //either or, result is negative
+    }
+    else{
+        sign = -1;      //both nagative so result is positive
+    }
+    return sign;
+
+}
+
+Number applyOperand(Number a,Number b, char op){        //ACTUAL Operations are performed here
     Number result;
     initNumber(&result);
-    int detectOp = getAndReturnSignsOfNumber(a, b);
+    int detectOp = getAndReturnSignsOfNumber(a, b);     //get signs
     int flag = 0;
     int dec  = 0;
     reverse(&a.num);
     reverse(&b.num);
     switch(op){
         case '+':
-
-            if(detectOp == 1){
+            if(detectOp == 1){      //both numbers are positive
                 result.num = addList(a.num,b.num);
                 result.sign = '+';
             }
-            else if(detectOp == 2){
+            else if(detectOp == 2){     //if one is negative, then subtract
                 result.num = subList(a.num,b.num);
             }
-            else{
+            else{                       //both are negative so add but result is negative
                 result.num = addList(a.num,b.num);
                 result.sign = '-';
             }
             break;
 
         case '-':
-            if(a.sign == '-' && b.sign == '-'){
+            if(a.sign == '-' && b.sign == '-'){     //if both are negative then second number becomes positive and then subtract 
                 b.sign = '+';
                 result.num = subList(a.num, b.num);
 
             }
-            else if(detectOp == 1){
+            else if(detectOp == 1){         //if both are positive, then subtract
                 result.num= subList(a.num, b.num);
             }
             else if(detectOp == 2){
-                if( a.sign == '-'){
+                if( a.sign == '-'){     //if first number is negative then add the lists and result is negative
                     result.num= addList(a.num, b.num);
                     result.sign = '-';
                 }
-                else{
+                else{               //if second number is negative then add the lists and result is positive
                     result.num= addList(a.num, b.num);
                     result.sign = '+';
                 }
             }
 
-
-            else{
+            else{       //default
                 result.num= addList(a.num, b.num);
                 result.sign = '-';
             }
@@ -140,35 +133,36 @@ Number applyOperand(Number a,Number b, char op){
 
         case '*':
             flag = 1;
-            // dec = 3;
-            result.num= mulList(a.num, b.num);
-            if(detectOp == 2){
+            result.num= mulList(a.num, b.num);  //multiply numbers
+            if(detectOp == 2){      //if either is negative, the result is negative
                 result.sign = '-';
             }
-            else{
+            else{       //if both are positive or both are negative, result is positive
                 result.sign = '+';
             }
             break;
 
         case '/':
             flag = 1;
-            result.num=  divList(a.num, b.num);
-            if(detectOp == 2){
+            result.num=  divList(a.num, b.num);     //divide numbers
+            if(detectOp == 2){      //if either is negative, the result is negative
                 result.sign = '-';
             }
-            else{
+            else{       //if both are positive or both are negative, result is positive
                 result.sign = '+';
             }
             break;
 
-        case '%': result.num= modList(a.num, b.num);
-            if(detectOp == 2){
+        case '%': 
+            result.num= modList(a.num, b.num);
+            if(detectOp == 2){      //if either is negative, the result is negative
                 result.sign = '-';
             }
-            else{
+            else{       //if both are positive or both are negative, result is positive
                 result.sign = '+';
             }
             break;
+
         case '^' : result.num= powList(a.num, b.num);
             break;
     }
@@ -176,15 +170,16 @@ Number applyOperand(Number a,Number b, char op){
     return result;
 }
 void infixEvaluation(char *str){
-    CharStack cStack;
-    NumStack nStack;
+    CharStack cStack;       //stack to store all operators
+    NumStack nStack;        //stack to store the numbers for infix evaluation
 
     Number l1,l2,result;
     initNumber(&l1);
     initNumber(&l2);
     initNumber(&result);
     int count = 0 , countop = 0;
-    for(int i = 0 ; str[i] != '\0' ; i++){
+
+    for(int i = 0 ; str[i] != '\0' ; i++){      //count the no. of operators and operands
         if(isOperator(str[i]))
             countop++;
         count++;
@@ -195,10 +190,10 @@ void infixEvaluation(char *str){
     initStackC(&cStack,n);
     int flag = 0;
     int check = 0 ;
+
     for(int i = 0 ; i < count+1; i++){
         char ch = str[i];
         int num = ch - '0';
-        // printf("\n\nChar to be checked: %c", ch);
         if(i == 0 && (ch == '-' || ch == '+')){
             Number temp;
             initNumber(&temp);
@@ -208,15 +203,11 @@ void infixEvaluation(char *str){
         if(ch == ' ')
             continue;
 
-        if(ch == '('){
-            // if(l1.num){
-            //     pushNumOnStack(&nStack, l1);
-            //     initNumber(&l1);
-            // }
+        if(ch == '('){      //always push opening bracket on stack
             pushC(&cStack,'(');
         }
 
-        else if(isNumber(ch)){
+        else if(isNumber(ch)){      //-if numeric value, then add to list
             flag = 0;
             while(isNumber(ch)) {
                 push(&l1.num,num);
@@ -225,50 +216,32 @@ void infixEvaluation(char *str){
                 num = ch - '0';
                 l1.count = l1.count + 1;
             }
-            // printf("Count is: %d\n", l1.count);
-            //     displayList(l1.num);
-                // if(l1.num && !l1.num -> next){
-                // printf("hkjnjbhgu");
-                if(check == 2){
-                    // printf("Check is 2");
-                    check = 0;
-                    if(l1.sign == '-' )
-                        l1.sign = '+';
-                    else
-                        l1.sign = '-';
+            if(check == 2){     //check for negative value
+                check = 0;
+                if(l1.sign == '-' )
+                    l1.sign = '+';
+                else
+                    l1.sign = '-';
 
-                }
-                else if(check == 3){
-                    // printf("Check is 3");
-                    check = 0;
-                    if(l1.sign == '-')
-                        l1.sign = '-';
-                    else
-                        l1.sign = '+';
-                }
-                else{
-                    // printf("Check is 0");
-                    check = 0;
-                }
-                l1.num = removeStartingZeros(l1.num);
-                reverse(&l1.num);
-                pushNumOnStack(&nStack,l1);
-                initNumber(&l1);
-                i--;
-                continue;
-            // }
-        // printf("Entered isNumber");
-        // exit(0);
-        }
+            }
+            else if(check == 3){
+                check = 0;
+                if(l1.sign == '-')
+                    l1.sign = '-';
+                else
+                    l1.sign = '+';
+            }
+            else{
+                check = 0;
+            }
+            l1.num = removeStartingZeros(l1.num);
+            reverse(&l1.num);
+            pushNumOnStack(&nStack,l1);
+            initNumber(&l1);
+            i--;
+    }
 
-        else if(ch == ')'){
-            // printf("Entered closing brackets");
-
-            // if(l1.num){
-            //     pushNumOnStack(&nStack, l1);
-            //     initNumber(&l1);
-            // }
-            // else 
+        else if(ch == ')'){     //if closing bracket, pop all operators and evaluate simultaneously until opening bracket is found
             if(str[i-1] == '('){
                 if(ch == '-' ){
                     check = 2;
@@ -305,10 +278,7 @@ void infixEvaluation(char *str){
             printf("Invalid\n");
             exit(0);
         }
-        else{
-            // printf("Entered ELSE");
-            // printf("hello");
-            // exit(0);
+        else{       //if not brackets, then check for precedence, and perform operations accordingly
             if(l1.num){
                 pushNumOnStack(&nStack, l1);
                 initNumber(&l1);
@@ -324,8 +294,8 @@ void infixEvaluation(char *str){
                     continue;
                 }
             }
-
-            while(topC(cStack) != ' ' && precedence(topC(cStack)) >= precedence(ch)){
+//if precedence of incoming operator is less than or equal to top of stack then pop the operator and evaluate
+            while(topC(cStack) != ' ' && precedence(topC(cStack)) >= precedence(ch)){   
                 if(sizeofNumStack(nStack) < 2)
                 {
                     printf("Invalid Operands");
@@ -343,4 +313,3 @@ void infixEvaluation(char *str){
     displayN(nStack);
 
 }
-
